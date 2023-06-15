@@ -23,7 +23,7 @@ classifiers = [
 ]
 keywords = ["developer-tools", "devops"]
 dependencies = [
-    "msgspec >= 0.15.1",
+    "msgspec >= 0.16.0",
 ]
 requires-python = ">=3.9"
 

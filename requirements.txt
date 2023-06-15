@@ -1,1 +1,1 @@
-msgspec==0.15.1
+msgspec==0.16.0
