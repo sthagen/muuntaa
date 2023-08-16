@@ -3,23 +3,23 @@
   "spdxVersion" : "SPDX-2.3",
   "creationInfo" : {
     "comment" : "Converted from CycloneDX spec version 1.4",
-    "created" : "2023-08-15T06:11:37Z",
+    "created" : "2023-08-16T06:31:38Z",
     "creators" : [ "Tool: CycloneDX:cyclonedx-bom-3.11.2", "Tool: CycloneDX:cyclonedx-python-lib-3.1.5", "Tool: CycloneToSpdx-0.1.4" ],
     "licenseListVersion" : "3.21"
   },
   "name" : "SBOM-for-msgspec",
   "dataLicense" : "CC0-1.0",
   "annotations" : [ {
-    "annotationDate" : "2023-08-15T06:11:38Z",
+    "annotationDate" : "2023-08-16T06:31:41Z",
     "annotationType" : "OTHER",
     "annotator" : "Tool: CycloneToSpdx",
     "comment" : "MISSING_CDX_PROPERTY:extensions={}"
   } ],
-  "documentNamespace" : "https://cyclonedx/6a1b8838-a1d8-4066-bb3d-a6360ddf623c_1",
+  "documentNamespace" : "https://cyclonedx/d4457470-22f4-419c-8ec8-c4d4eaff29f1_1",
   "packages" : [ {
-    "SPDXID" : "SPDXRef-9273c2c7-f051-4298-a0c9-b0fff68ae703",
+    "SPDXID" : "SPDXRef-b7e6a4d2-710c-4913-80cc-787abc13f188",
     "annotations" : [ {
-      "annotationDate" : "2023-08-15T06:11:38Z",
+      "annotationDate" : "2023-08-16T06:31:41Z",
       "annotationType" : "OTHER",
       "annotator" : "Tool: CycloneToSpdx",
       "comment" : "MISSING_CDX_PROPERTY:componentType=\"LIBRARY\""
@@ -41,6 +41,6 @@
   "relationships" : [ {
     "spdxElementId" : "SPDXRef-DOCUMENT",
     "relationshipType" : "DESCRIBES",
-    "relatedSpdxElement" : "SPDXRef-9273c2c7-f051-4298-a0c9-b0fff68ae703"
+    "relatedSpdxElement" : "SPDXRef-b7e6a4d2-710c-4913-80cc-787abc13f188"
   } ]
 }
