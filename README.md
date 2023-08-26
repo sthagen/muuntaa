@@ -7,7 +7,7 @@ Convert (Finnish: muuntaa) CVRF v1.2 XML to CSAF v2.0 JSON documents.
 Third party dependencies are documented in the folder [third-party](docs/third-party/README.md).
 
 [![version](https://img.shields.io/pypi/v/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
-[![downloads](https://pepy.tech/badge/muuntaa/month)](https://pepy.tech/project/muuntaa)
+[![downloads](https://static.pepy.tech/badge/muuntaa/month)](https://pepy.tech/project/muuntaa)
 [![wheel](https://img.shields.io/pypi/wheel/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
 [![supported-versions](https://img.shields.io/pypi/pyversions/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
 [![supported-implementations](https://img.shields.io/pypi/implementation/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
