@@ -10,7 +10,7 @@ Convert (Finnish: muuntaa) CVRF v1.2 XML to CSAF v2.0 JSON documents.
 [![Version](https://img.shields.io/pypi/v/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
 [![Downloads](https://static.pepy.tech/badge/muuntaa/month)](https://pepy.tech/project/muuntaa)
 [![Supported Versions](https://img.shields.io/pypi/pyversions/muuntaa.svg?style=flat)](https://pypi.python.org/pypi/muuntaa/)
-[![Maintenance Status](https://img.shields.io/github/commit-activity/y/sthagen/muuntaa.svg?style=flat)](https://git.sr.ht/~sthagen/muuntaa/log)
+[![Maintenance Status](docs/badges/downloads-per-month.svg)](https://git.sr.ht/~sthagen/muuntaa/log)
 
 ## Bug Tracker
 
