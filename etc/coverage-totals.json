@@ -1,7 +1,7 @@
 {
   "muuntaa": {
-    "version": "7.3.2",
-    "timestamp": "2023-12-02T15:27:22.320054",
+    "coverage_tool_version": "7.3.2",
+    "timestamp": "2023-12-02 16:25:36 +00:00",
     "branch_coverage": false,
     "show_contexts": true,
     "covered_lines": 0,
@@ -9,6 +9,26 @@
     "percent_covered": 100,
     "percent_covered_display": "100.00",
     "missing_lines": 0,
-    "excluded_lines": 0
+    "excluded_lines": 0,
+    "node_id": "c79891e5-aabf-3a83-95b9-588edcd8327f",
+    "nfiles": 7,
+    "files": [
+      "muuntaa/__init__.py",
+      "muuntaa/api.py",
+      "muuntaa/cli.py",
+      "muuntaa/config.py",
+      "muuntaa/csaf.py",
+      "muuntaa/cvrf.py",
+      "muuntaa/report.py"
+    ],
+    "blake3": "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262",
+    "blake2": "786a02f742015903c6c6fd852552d272912f4740e15847618a86e217f71f5419d25e1031afee585313896444934eb04b903a685b1448b755d56f701afe9be2ce",
+    "sha512": "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
+    "sha384": "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha1": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "md5": "d41d8cd98f00b204e9800998ecf8427e",
+    "python_version": "3.10.12",
+    "entropy": 0
   }
 }
