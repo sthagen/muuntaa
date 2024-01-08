@@ -18,7 +18,7 @@ def write_csaf(csaf_dict: dict[str, object], file_path: Pathlike, options: Write
         options = {'ensure_ascii': False, 'indent': 2}
     scoped_messages = []
     path = pathlib.Path(file_path).expanduser().resolve()
-    base_dir = path.parent.absolute()
+    base_dir = path.parent
     try:
         if not base_dir.is_dir():
             path.mkdir(parents=True, exist_ok=True)
