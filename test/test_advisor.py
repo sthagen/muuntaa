@@ -12,7 +12,7 @@ import muuntaa.advisor as advisor
         ('csaf', True, f'csaf{advisor.CSAF_FILE_SUFFIX}'),
         ('csaf', False, f'csaf{advisor.INVALID}{advisor.CSAF_FILE_SUFFIX}'),
         (None, True, f'{advisor.ID_UNKNOWN}{advisor.CSAF_FILE_SUFFIX}'),
-    ]
+    ],
 )
 def test_derive_csaf_filename(identifier, is_valid, expected):
     assert advisor.derive_csaf_filename(identifier, is_valid) == expected
