@@ -48,5 +48,3 @@ def test_app_invalid_input_file_content_override_force(caplog, capsys):
     assert not err
     assert not out
     assert 'out_invalid.json.' in caplog.text
-
-
