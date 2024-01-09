@@ -141,3 +141,4 @@ current-bandit.json
 
 # Local specific ignores
 book
+out_invalid.json

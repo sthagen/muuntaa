@@ -1,22 +1,15 @@
 import json
 import logging
 import pathlib
-from typing import Union
 
-Pathlike = Union[str, pathlib.Path]
-LogLevel = int
-ScopedMessage = tuple[LogLevel, str]
-WriterOptions = Union[None, dict[str, Union[bool, int]]]
-
-CSAF_FILE_SUFFIX = '.json'
-ENCODING = 'utf-8'
+from muuntaa import CSAF_FILE_SUFFIX, ENCODING, Pathlike, ScopedMessages, WriterOptions
 
 
-def write_csaf(csaf_dict: dict[str, object], file_path: Pathlike, options: WriterOptions = None) -> list[ScopedMessage]:
+def write_csaf(csaf_dict: dict[str, object], file_path: Pathlike, options: WriterOptions = None) -> ScopedMessages:
     """Write the CSAF data from python dict into a CSAF JSON file creating path as needed."""
     if options is None:
         options = {'ensure_ascii': False, 'indent': 2}
-    scoped_messages = []
+    scoped_messages: ScopedMessages = []
     path = pathlib.Path(file_path).expanduser().resolve()
     base_dir = path.parent
     try:

@@ -1,0 +1,23 @@
+cvrf2csaf_name: CVRF-CSAF-Converter
+
+# General config
+# Force conversion, produces invalid output to be fixed manually
+force: false
+
+# Document leaf elements
+csaf_version: '2.0'
+
+# Document Publisher
+publisher_name: Publisher Name
+publisher_namespace: https://example.com
+
+# Document Tracking
+fix_insert_current_version_into_revision_history: false
+
+# Document References
+force_insert_default_reference_category: true
+
+# Vulnerability
+remove_CVSS_values_without_vector: false
+
+default_CVSS3_version : "3.0"

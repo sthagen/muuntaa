@@ -1,4 +1,6 @@
 import datetime as dti
+import logging
+
 import pytest
 
 import muuntaa.strftime as strftime
@@ -7,8 +9,19 @@ import muuntaa.strftime as strftime
 @pytest.mark.parametrize(
     'ts_text,expected',
     [
-        ('4200-12-31T12:34:56Z', ('4200-12-31T12:34:56.000+00:00', '')),
-        ('no-timestamp', (None, "invalid time stamp provided no-timestamp: Invalid isoformat string: 'no-timestamp'.")),
+        ('4200-12-31T12:34:56Z', ('4200-12-31T12:34:56.000+00:00', [])),
+        (
+            'no-timestamp',
+            (
+                None,
+                [
+                    (
+                        logging.CRITICAL,
+                        "invalid time stamp provided no-timestamp: Invalid isoformat string: 'no-timestamp'.",
+                    ),
+                ],
+            ),
+        ),
     ],
 )
 def test_get_utc_timestamp(ts_text, expected):

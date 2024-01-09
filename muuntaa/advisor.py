@@ -8,7 +8,7 @@ CSAF_FILENAME_PATTERN = re.compile(r'([^+\-a-z0-9]+)')
 CSAF_FILE_SUFFIX = '.json'
 
 
-def derive_csaf_filename(identifier: Union[str, None], is_valid: bool) -> str:
+def derive_csaf_filename(identifier: Union[str, None] = None, is_valid: bool = False) -> str:
     """Returns CSAF filename derived from the identifier (according to CSAF v2.0 OASIS standard) and the validity.
 
     Cf. https://docs.oasis-open.org/csaf/csaf/v2.0/csaf-v2.0.html#51-filename
