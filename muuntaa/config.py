@@ -1,4 +1,5 @@
 """Handling functions for configuration resources."""
+
 import logging
 import pkgutil
 from typing import Iterable, Union

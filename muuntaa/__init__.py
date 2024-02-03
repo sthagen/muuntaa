@@ -1,4 +1,5 @@
 """Convert (Finnish: muuntaa) CVRF v1.2 XML to CSAF v2.0 JSON documents."""
+
 import datetime as dti
 import logging
 import os
