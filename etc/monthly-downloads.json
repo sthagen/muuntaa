@@ -2,18 +2,8 @@
   "data": [
     {
       "category": "3.10",
-      "date": "2023-10",
-      "downloads": 7
-    },
-    {
-      "category": "3.10",
       "date": "2024-04",
       "downloads": 2
-    },
-    {
-      "category": "3.11",
-      "date": "2023-10",
-      "downloads": 1
     },
     {
       "category": "3.11",
@@ -23,7 +13,7 @@
     {
       "category": "3.3",
       "date": "2023-10",
-      "downloads": 6
+      "downloads": 2
     },
     {
       "category": "3.3",
@@ -43,7 +33,7 @@
     {
       "category": "null",
       "date": "2023-10",
-      "downloads": 93
+      "downloads": 42
     },
     {
       "category": "null",
