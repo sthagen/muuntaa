@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Protocol
 
-import lxml.objectify
+import lxml.objectify  # nosec B410
 
 RootType = lxml.objectify.ObjectifiedElement
 
