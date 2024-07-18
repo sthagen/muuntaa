@@ -4,7 +4,7 @@ from typing import Protocol
 
 class Subtree(Protocol):
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.tree = {}
 
     def always(self, root) -> None:
@@ -30,18 +30,15 @@ class Subtree(Protocol):
 class DocumentLeafs(Subtree):
     """Represent leaf element content below CSAF path (/document)."""
 
-    def __init__(self, config):
+    def __init__(self, config) -> None:
         super().__init__()
-        self.csaf_version = config.get('csaf_version')
+        self.tree['csaf_version'] = config.get('csaf_version')
 
-    def always(self, root):
-        # This element is new in CSAF, not present in CVRF
-        self.tree['csaf_version'] = self.csaf_version
-
+    def always(self, root) -> None:
         self.tree['category'] = root.DocumentType.text
         self.tree['title'] = root.DocumentTitle.text
 
-    def sometimes(self, root):
+    def sometimes(self, root) -> None:
         if doc_dist := root.DocumentDistribution:
             self.tree['distribution'] = {'text': doc_dist.text}
 
