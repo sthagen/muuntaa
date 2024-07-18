@@ -73,7 +73,7 @@ class TopicalTrans:
 
     def late(self, term: str) -> str:
         """Play safe, when you trans.late(a_term)."""
-        return self.pairs.get(term, self.not_found)
+        return self.pairs.get(term, self.not_found)  # type: ignore
 
 
 branch_trans = TopicalTrans(BRANCH_TYPE)

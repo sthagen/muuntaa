@@ -1,19 +1,24 @@
 import logging
-from typing import Protocol
+from typing import Any, Protocol
+
+import lxml.objectify
+
+RootType = lxml.objectify.ObjectifiedElement
 
 
 class Subtree(Protocol):
+    tree: dict[str, Any] = None  # type: ignore
 
     def __init__(self) -> None:
         self.tree = {}
 
-    def always(self, root) -> None:
+    def always(self, root: RootType) -> None:
         pass
 
-    def sometimes(self, root) -> None:
+    def sometimes(self, root: RootType) -> None:
         pass
 
-    def load(self, root) -> None:
+    def load(self, root: RootType) -> None:
         try:
             self.always(root)
         except Exception as e:
@@ -23,22 +28,22 @@ class Subtree(Protocol):
         except Exception as e:
             logging.error('ingesting sometimes present element %s failed with %s', root.tag, e)
 
-    def dump(self) -> dict[str, object]:
+    def dump(self) -> dict[str, Any]:
         return self.tree
 
 
 class DocumentLeafs(Subtree):
     """Represent leaf element content below CSAF path (/document)."""
 
-    def __init__(self, config) -> None:
+    def __init__(self, config: dict[str, str]) -> None:
         super().__init__()
         self.tree['csaf_version'] = config.get('csaf_version')
 
-    def always(self, root) -> None:
+    def always(self, root: RootType) -> None:
         self.tree['category'] = root.DocumentType.text
         self.tree['title'] = root.DocumentTitle.text
 
-    def sometimes(self, root) -> None:
+    def sometimes(self, root: RootType) -> None:
         if doc_dist := root.DocumentDistribution:
             self.tree['distribution'] = {'text': doc_dist.text}
 
