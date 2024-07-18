@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2024-07-18T18:24:43Z",
+  "generated_at": "2024-07-18T18:55:27Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 0,
@@ -11,9 +11,9 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 439,
+      "loc": 441,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 1
     },
     "muuntaa/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -167,9 +167,9 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 36,
+      "loc": 38,
       "nosec": 0,
-      "skipped_tests": 0
+      "skipped_tests": 1
     },
     "muuntaa/writer.py": {
       "CONFIDENCE.HIGH": 0,
