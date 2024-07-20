@@ -3,7 +3,10 @@ from typing import Any
 
 from lxml import etree, objectify
 
-import muuntaa.subtree as subtree
+from muuntaa.ack import Acknowledgments
+from muuntaa.document import DocumentLeafs, Publisher, Tracking
+from muuntaa.notes import Notes
+from muuntaa.refs import References
 from muuntaa import APP_ALIAS, VERSION
 
 CFG = {'csaf_version': '2.0'}
@@ -247,7 +250,7 @@ def test_document_leafs(caplog):
             'title': 'AppY Stream Control Transmission Protocol',
         }
     }
-    dle = subtree.DocumentLeafs(CFG)
+    dle = DocumentLeafs(CFG)
     caplog.set_level(logging.INFO)
     dle.load(ROOT_EXAMPLE_A)
     assert dle.dump() == expected
@@ -291,7 +294,7 @@ def test_tl_acknowledgements(caplog):
         },
     }
 
-    acks = subtree.Acknowledgments(lc_parent_code='cvrf')
+    acks = Acknowledgments(lc_parent_code='cvrf')
     caplog.set_level(logging.WARNING)
     # raise OSError(lmxl_dump(ROOT_HAS_TL_ACKS))
     acks.load(ROOT_HAS_TL_ACKS.Acknowledgments)
@@ -319,7 +322,7 @@ def test_tl_notes(caplog):
         },
     }
 
-    part = subtree.Notes(lc_parent_code='cvrf')
+    part = Notes(lc_parent_code='cvrf')
     caplog.set_level(logging.ERROR)
     part.load(ROOT_HAS_TL_NOTES.DocumentNotes)
     assert not part.has_errors()
@@ -340,7 +343,7 @@ def test_tl_references(caplog):
         },
     }
 
-    part = subtree.References(config=CFG, lc_parent_code='cvrf')
+    part = References(config=CFG, lc_parent_code='cvrf')
     caplog.set_level(logging.INFO)
     part.load(ROOT_HAS_TL_REFERENCES.DocumentReferences)
     assert not part.has_errors()
@@ -361,7 +364,7 @@ def test_tl_publisher(caplog):
         },
     }
 
-    part = subtree.Publisher(config=CFG_TOO)
+    part = Publisher(config=CFG_TOO)
     caplog.set_level(logging.INFO)
     part.load(ROOT_HAS_TL_PUBLISHER.DocumentPublisher)
     assert not part.has_errors()
@@ -400,7 +403,7 @@ def test_tl_tracking(caplog):
         },
     }
 
-    part = subtree.Tracking(config=CFG)
+    part = Tracking(config=CFG)
     caplog.set_level(logging.ERROR)
     part.load(ROOT_HAS_TL_TRACKING.DocumentTracking)
     assert not part.has_errors()
@@ -418,7 +421,7 @@ def test_document_with_tl_acks(caplog):
             'title': 'AppY Stream Control Transmission Protocol',
         }
     }
-    dle = subtree.DocumentLeafs(CFG)
+    dle = DocumentLeafs(CFG)
     caplog.set_level(logging.INFO)
     dle.load(ROOT_EXAMPLE_A)
     assert dle.dump() == expected_dle
@@ -453,7 +456,7 @@ def test_document_with_tl_acks(caplog):
             ],
         },
     }
-    acks = subtree.Acknowledgments(lc_parent_code='cvrf')
+    acks = Acknowledgments(lc_parent_code='cvrf')
     caplog.set_level(logging.WARNING)
     acks.load(ROOT_HAS_TL_ACKS.Acknowledgments)
     assert acks.dump() == expected_ack
