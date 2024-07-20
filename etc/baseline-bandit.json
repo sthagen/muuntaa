@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2024-07-20T17:40:07Z",
+  "generated_at": "2024-07-20T19:39:55Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 0,
@@ -11,9 +11,9 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 771,
+      "loc": 1071,
       "nosec": 0,
-      "skipped_tests": 1
+      "skipped_tests": 6
     },
     "muuntaa/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -40,6 +40,19 @@
       "loc": 4,
       "nosec": 0,
       "skipped_tests": 0
+    },
+    "muuntaa/ack.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 54,
+      "nosec": 0,
+      "skipped_tests": 1
     },
     "muuntaa/advisor.py": {
       "CONFIDENCE.HIGH": 0,
@@ -93,32 +106,6 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "muuntaa/csaf.py": {
-      "CONFIDENCE.HIGH": 0,
-      "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 0,
-      "CONFIDENCE.UNDEFINED": 0,
-      "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 0,
-      "SEVERITY.UNDEFINED": 0,
-      "loc": 0,
-      "nosec": 0,
-      "skipped_tests": 0
-    },
-    "muuntaa/cvrf.py": {
-      "CONFIDENCE.HIGH": 0,
-      "CONFIDENCE.LOW": 0,
-      "CONFIDENCE.MEDIUM": 0,
-      "CONFIDENCE.UNDEFINED": 0,
-      "SEVERITY.HIGH": 0,
-      "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 0,
-      "SEVERITY.UNDEFINED": 0,
-      "loc": 0,
-      "nosec": 0,
-      "skipped_tests": 0
-    },
     "muuntaa/dialect.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
@@ -132,7 +119,33 @@
       "nosec": 0,
       "skipped_tests": 0
     },
-    "muuntaa/report.py": {
+    "muuntaa/document.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 199,
+      "nosec": 0,
+      "skipped_tests": 1
+    },
+    "muuntaa/notes.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 48,
+      "nosec": 0,
+      "skipped_tests": 1
+    },
+    "muuntaa/product.py": {
       "CONFIDENCE.HIGH": 0,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
@@ -144,6 +157,19 @@
       "loc": 0,
       "nosec": 0,
       "skipped_tests": 0
+    },
+    "muuntaa/refs.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 51,
+      "nosec": 0,
+      "skipped_tests": 1
     },
     "muuntaa/strftime.py": {
       "CONFIDENCE.HIGH": 0,
@@ -167,7 +193,20 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 354,
+      "loc": 28,
+      "nosec": 0,
+      "skipped_tests": 1
+    },
+    "muuntaa/vuln.py": {
+      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.LOW": 0,
+      "CONFIDENCE.MEDIUM": 0,
+      "CONFIDENCE.UNDEFINED": 0,
+      "SEVERITY.HIGH": 0,
+      "SEVERITY.LOW": 0,
+      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.UNDEFINED": 0,
+      "loc": 274,
       "nosec": 0,
       "skipped_tests": 1
     },
