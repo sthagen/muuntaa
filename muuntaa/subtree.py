@@ -226,3 +226,41 @@ class References(Subtree):
 
     def sometimes(self, root: RootType) -> None:
         pass
+
+
+class Publisher(Subtree):
+    """Represents the Publisher type:
+
+    (
+        /cvrf:cvrfdoc/cvrf:DocumentPublisher,
+    )
+    """
+
+    CATEGORY_OF = {
+        'Coordinator': 'coordinator',
+        'Discoverer': 'discoverer',
+        'Other': 'other',
+        'User': 'user',
+        'Vendor': 'vendor',
+    }
+
+    def __init__(self, config: ConfigType):
+        super().__init__()
+        if self.tree.get('document') is None:
+            self.tree['document'] = {}
+        if self.tree['document'].get('publisher') is None:
+            self.tree['document']['publisher'] = {
+                'name': config.get('publisher_name'),
+                'namespace': config.get('publisher_namespace'),
+            }
+        self.hook = self.tree['document']['publisher']
+
+    def always(self, root: RootType) -> None:
+        category = self.CATEGORY_OF.get(root.attrib.get('Type', ''))
+        self.hook['category'] = category
+
+    def sometimes(self, root: RootType) -> None:
+        if contact_details := root.ContactDetails:
+            self.hook['contact_details'] = contact_details.text
+        if issuing_authority := root.IssuingAuthority:
+            self.hook['issuing_authority'] = issuing_authority.text

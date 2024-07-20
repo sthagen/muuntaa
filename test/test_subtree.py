@@ -6,7 +6,10 @@ from lxml import etree, objectify
 import muuntaa.subtree as subtree
 
 CFG = {'csaf_version': '2.0'}
-
+CFG_TOO = {
+    'publisher_name': 'Publisher Name',
+    'publisher_namespace': 'https://example.com',
+}
 
 EXAMPLE_A_XML = """\
 <cvrfdoc
@@ -158,10 +161,38 @@ HAS_TL_REFERENCES_XML = """\
 </cvrfdoc>
 """
 
+HAS_TL_PUBLISHER_XML = """\
+<cvrfdoc
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:cpe="http://cpe.mitre.org/language/2.0"
+  xmlns:cvrf="http://docs.oasis-open.org/csaf/ns/csaf-cvrf/v1.2/cvrf"
+  xmlns:cvrf-common="http://docs.oasis-open.org/csaf/ns/csaf-cvrf/v1.2/common"
+  xmlns:cvssv2="http://scap.nist.gov/schema/cvss-v2/1.0"
+  xmlns:cvssv3="https://www.first.org/cvss/cvss-v3.0.xsd"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:ns0="http://purl.org/dc/elements/1.1/"
+  xmlns:prod="http://docs.oasis-open.org/csaf/ns/csaf-cvrf/v1.2/prod"
+  xmlns:scap-core="http://scap.nist.gov/schema/scap-core/1.0"
+  xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+  xmlns:vuln="http://docs.oasis-open.org/csaf/ns/csaf-cvrf/v1.2/vuln"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://docs.oasis-open.org/csaf/ns/csaf-cvrf/v1.2/cvrf"
+  >
+  <!-- Document wide context information -->
+  <DocumentTitle>AppY Stream Control Transmission Protocol</DocumentTitle>
+  <DocumentType>Security Advisory</DocumentType>
+  <DocumentPublisher Type="Vendor">
+      <ContactDetails>Emergency Support: ...</ContactDetails>
+      <IssuingAuthority>... Team (PSIRT)....</IssuingAuthority>
+  </DocumentPublisher>
+</cvrfdoc>
+"""
+
 ROOT_EXAMPLE_A = objectify.fromstring(EXAMPLE_A_XML)
 ROOT_HAS_TL_ACKS = objectify.fromstring(HAS_TL_ACKS_XML)
 ROOT_HAS_TL_NOTES = objectify.fromstring(HAS_TL_NOTES_XML)
 ROOT_HAS_TL_REFERENCES = objectify.fromstring(HAS_TL_REFERENCES_XML)
+ROOT_HAS_TL_PUBLISHER = objectify.fromstring(HAS_TL_PUBLISHER_XML)
 
 
 def test_document_leafs(caplog):
@@ -268,6 +299,27 @@ def test_tl_references(caplog):
     part = subtree.References(config=CFG, lc_parent_code='cvrf')
     caplog.set_level(logging.INFO)
     part.load(ROOT_HAS_TL_REFERENCES.DocumentReferences)
+    assert not part.has_errors()
+    assert part.dump() == expected
+    assert not caplog.text
+
+
+def test_tl_publisher(caplog):
+    expected = {
+        'document': {
+            'publisher': {
+                'category': 'vendor',
+                'contact_details': 'Emergency Support: ...',
+                'issuing_authority': '... Team (PSIRT)....',
+                'name': 'Publisher Name',
+                'namespace': 'https://example.com',
+            },
+        },
+    }
+
+    part = subtree.Publisher(config=CFG_TOO)
+    caplog.set_level(logging.INFO)
+    part.load(ROOT_HAS_TL_PUBLISHER.DocumentPublisher)
     assert not part.has_errors()
     assert part.dump() == expected
     assert not caplog.text
