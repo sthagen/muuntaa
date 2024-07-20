@@ -4,6 +4,7 @@ import datetime as dti
 import logging
 import os
 import pathlib
+import sys
 from typing import Union, no_type_check
 
 # [[[fill git_describe()]]]
@@ -46,6 +47,22 @@ ScopedMessage = tuple[LogLevel, str]
 ScopedMessages = list[ScopedMessage]
 WriterOptions = Union[None, dict[str, Union[bool, int]]]
 
+
+def cleanse_id(id_string: str) -> str:
+    """Strips spaces and linebreaks from the ID string and logs a warning if the ID string was changed."""
+    if (cleansed := id_string.strip().replace('\r', '').replace('\n', '')) != id_string:
+        logging.warning('The ID string contained leading/trailing whitespace or linebreaks. These were removed.')
+    return cleansed
+
+
+def integer_tuple(text: str) -> tuple[int, ...]:
+    """Convert a string of dotted integers into tuple of integers"""
+    try:
+        return tuple(int(part) for part in text.split('.'))
+    except ValueError:
+        return (sys.maxsize,)
+
+
 __all__: list[str] = [
     'APP_ALIAS',
     'APP_ENV',
@@ -67,6 +84,8 @@ __all__: list[str] = [
     'VERSION',
     'VERSION_DOTTED_TRIPLE',
     'WriterOptions',
+    'cleanse_id',
+    'integer_tuple',
     'log',
 ]
 
