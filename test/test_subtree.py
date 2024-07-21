@@ -4,7 +4,7 @@ from typing import Any
 from lxml import etree, objectify
 
 from muuntaa.ack import Acknowledgments
-from muuntaa.document import DocumentLeafs, Publisher, Tracking
+from muuntaa.document import Leafs, Publisher, Tracking
 from muuntaa.notes import Notes
 from muuntaa.refs import References
 from muuntaa import APP_ALIAS, VERSION
@@ -242,7 +242,7 @@ ROOT_HAS_TL_PUBLISHER = objectify.fromstring(HAS_TL_PUBLISHER_XML)
 ROOT_HAS_TL_TRACKING = objectify.fromstring(HAS_TL_TRACKING_XML)
 
 
-def test_document_leafs(caplog):
+def test_leafs(caplog):
     expected = {
         'document': {
             'csaf_version': '2.0',
@@ -250,7 +250,7 @@ def test_document_leafs(caplog):
             'title': 'AppY Stream Control Transmission Protocol',
         }
     }
-    dle = DocumentLeafs(CFG)
+    dle = Leafs(CFG)
     caplog.set_level(logging.INFO)
     dle.load(ROOT_EXAMPLE_A)
     assert dle.dump() == expected
@@ -421,7 +421,7 @@ def test_document_with_tl_acks(caplog):
             'title': 'AppY Stream Control Transmission Protocol',
         }
     }
-    dle = DocumentLeafs(CFG)
+    dle = Leafs(CFG)
     caplog.set_level(logging.INFO)
     dle.load(ROOT_EXAMPLE_A)
     assert dle.dump() == expected_dle

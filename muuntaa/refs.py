@@ -1,3 +1,5 @@
+"""References type."""
+
 import logging
 from typing import Union
 

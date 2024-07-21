@@ -1,3 +1,5 @@
+"""Vulnerabilities type."""
+
 import bisect
 import logging
 import re
@@ -19,8 +21,8 @@ RootType = lxml.objectify.ObjectifiedElement
 RevHistType = list[dict[str, Union[str, None, tuple[int, ...]]]]
 
 
-class Vulnerability(Subtree):
-    """Represents the Vulnerability type.
+class Vulnerabilities(Subtree):
+    """Represents the Vulnerabilities type.
 
     (
         /cvrf:cvrfdoc/vuln:Vulnerability,
@@ -134,7 +136,7 @@ class Vulnerability(Subtree):
             # ProductIDs and GroupIDs
             if 'product_ids' not in remediation and 'group_ids' not in remediation:
                 if product_status:
-                    product_ids = Vulnerability._parse_affected_product_ids(product_status)
+                    product_ids = Vulnerabilities._parse_affected_product_ids(product_status)
             if len(product_ids) != 0:
                 remediation['product_ids'] = product_ids
             else:

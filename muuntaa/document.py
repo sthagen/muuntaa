@@ -1,3 +1,5 @@
+"""Document specific types: Leaves, Publisher, and Tracking."""
+
 import logging
 import operator
 import re
@@ -8,13 +10,14 @@ import lxml.objectify  # nosec B410
 from muuntaa.config import boolify
 from muuntaa.strftime import get_utc_timestamp
 from muuntaa.subtree import Subtree
+
 from muuntaa import APP_ALIAS, ConfigType, NOW_CODE, VERSION, cleanse_id, integer_tuple
 
 RootType = lxml.objectify.ObjectifiedElement
 RevHistType = list[dict[str, Union[str, None, tuple[int, ...]]]]
 
 
-class DocumentLeafs(Subtree):
+class Leafs(Subtree):
     """Represent leaf element content below CSAF path.
 
     (
