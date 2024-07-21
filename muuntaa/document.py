@@ -2,16 +2,16 @@
 
 import logging
 import operator
-import re
 from typing import Any, Union
 
 import lxml.objectify  # nosec B410
 
 from muuntaa.config import boolify
+from muuntaa.dialect import PUBLISHER_TYPE_CATEGORY, TRACKING_STATUS
 from muuntaa.strftime import get_utc_timestamp
 from muuntaa.subtree import Subtree
 
-from muuntaa import APP_ALIAS, ConfigType, NOW_CODE, VERSION, cleanse_id, integer_tuple
+from muuntaa import APP_ALIAS, ConfigType, NOW_CODE, VERSION, VERSION_PATTERN, cleanse_id, integer_tuple
 
 RootType = lxml.objectify.ObjectifiedElement
 RevHistType = list[dict[str, Union[str, None, tuple[int, ...]]]]
@@ -54,14 +54,6 @@ class Publisher(Subtree):
     )
     """
 
-    CATEGORY_OF = {
-        'Coordinator': 'coordinator',
-        'Discoverer': 'discoverer',
-        'Other': 'other',
-        'User': 'user',
-        'Vendor': 'vendor',
-    }
-
     def __init__(self, config: ConfigType):
         super().__init__()
         if self.tree.get('document') is None:
@@ -74,7 +66,7 @@ class Publisher(Subtree):
         self.hook = self.tree['document']['publisher']
 
     def always(self, root: RootType) -> None:
-        category = self.CATEGORY_OF.get(root.attrib.get('Type', ''))
+        category = PUBLISHER_TYPE_CATEGORY.get(root.attrib.get('Type', ''))  # TODO consistent key error handling?
         self.hook['category'] = category
 
     def sometimes(self, root: RootType) -> None:
@@ -91,8 +83,6 @@ class Tracking(Subtree):
     )
     """
 
-    STATUS_OF = {'Draft': 'draft', 'Final': 'final', 'Interim': 'interim'}
-
     fix_insert_current_version_into_revision_history: bool = False
 
     def __init__(self, config: ConfigType):
@@ -101,6 +91,7 @@ class Tracking(Subtree):
         self.fix_insert_current_version_into_revision_history = config.get(  # type: ignore
             'fix_insert_current_version_into_revision_history', False
         )
+        print(f'{self.fix_insert_current_version_into_revision_history=}')
         processing_ts, problems = get_utc_timestamp(ts_text=NOW_CODE)
         for level, problem in problems:
             logging.log(level, problem)
@@ -126,7 +117,7 @@ class Tracking(Subtree):
         for level, problem in problems:
             logging.log(level, problem)
         revision_history, version = self._handle_revision_history_and_version(root)
-        status = self.STATUS_OF.get(root.Status.text, '')  # type: ignore
+        status = TRACKING_STATUS.get(root.Status.text, '')  # type: ignore
         self.hook['current_release_date'] = current_release_date
         self.hook['id'] = cleanse_id(root.Identification.ID.text or '')
         self.hook['initial_release_date'] = initial_release_date
@@ -139,27 +130,15 @@ class Tracking(Subtree):
             self.hook['aliases'] = [alias.text for alias in aliases]
 
     @staticmethod
-    def check_for_version_t(revision_history: RevHistType) -> bool:
-        """
-        Checks whether all version numbers in /document/tracking/revision_history match
-        semantic versioning. Semantic version is defined in version_t definition.
-        see: https://docs.oasis-open.org/csaf/csaf/v2.0/csaf-v2.0.html#3111-version-type
-        and section 9.1.5 Conformance Clause 5: CVRF CSAF converter
-        """
-
-        pattern = (
-            r'^((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)'
-            r'(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'
-            r'(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))'
-            r'?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$'
-        )
-        return all(re.match(pattern, revision['number']) for revision in revision_history)  # type: ignore
+    def only_version_t(revision_history: RevHistType) -> bool:
+        """Verifies whether all version numbers in /document/tracking/revision_history comply."""
+        return all(VERSION_PATTERN.match(revision['number']) for revision in revision_history)  # type: ignore
 
     def _add_current_revision_to_history(self, root: RootType, revision_history: RevHistType) -> None:
-        """
-        If the current version is missing in Revision history and
-        --fix-insert-current-version-into-revision-history is True,
-        the current version is added to the history.
+        """Adds the current version to history, if former is missing in latter and fix is requested.
+
+        The user can request the fix per --fix-insert-current-version-into-revision-history option
+        or per setting the respective configuration key to true.
         """
 
         entry_date, problems = get_utc_timestamp(root.CurrentReleaseDate.text or '')
@@ -195,60 +174,50 @@ class Tracking(Subtree):
         return revision_history_sorted, version  # type: ignore
 
     def _handle_revision_history_and_version(self, root: RootType) -> tuple[list[dict[str, Any]], str | None]:
-        # preprocess the data
-        revision_history = []
-        for revision in root.RevisionHistory.Revision:
-            # number_cvrf: keep original value in this variable for matching later
-            # number: this value might be overwritten later if some version numbers doesn't match
-            # semantic versioning
-            revision_history.append(
-                {
-                    'date': get_utc_timestamp(revision.Date.text or ''),  # type: ignore
-                    'number': revision.Number.text,  # type: ignore
-                    'summary': revision.Description.text,  # type: ignore
-                    # Extra vars
-                    'number_cvrf': revision.Number.text,  # type: ignore
-                    'version_as_int_tuple': integer_tuple(revision.Number.text or ''),  # type: ignore
-                }
-            )
-
-        # Just copy over the version
+        revision_history = [
+            {
+                'date': get_utc_timestamp(revision.Date.text or ''),  # type: ignore
+                'number': revision.Number.text,  # type: ignore # may be patched later (in case of mismatches)
+                'summary': revision.Description.text,  # type: ignore
+                'number_cvrf': revision.Number.text,  # type: ignore # keep track of original value (later matching)
+                'version_as_int_tuple': integer_tuple(revision.Number.text or ''),  # type: ignore # temporary
+            }
+            for revision in root.RevisionHistory.Revision
+        ]
         version = root.Version.text
 
         missing_latest_version_in_history = False
-        # Do we miss the current version in the revision history?
-        if not [rev for rev in revision_history if rev['number'] == version]:
+        if not [rev for rev in revision_history if rev['number'] == version]:  # Current version not in rev. history?
             if self.fix_insert_current_version_into_revision_history:
-                logging.warning(
-                    'Trying to fix the revision history by adding the current version. '
-                    'This may lead to inconsistent history. This happens because '
-                    '--fix-insert-current-version-into-revision-history is used. '
-                )
                 self._add_current_revision_to_history(root, revision_history)
-            else:
-                logging.error(
-                    'Current version is missing in revision history. This can be fixed by'
-                    ' using --fix-insert-current-version-into-revision-history.'
+                level = logging.WARNING
+                message = (
+                    'Trying to fix the revision history by adding the current version.'
+                    ' This may lead to inconsistent history.'
+                    ' This happens because --fix-insert-current-version-into-revision-history is used.'
                 )
+            else:
                 missing_latest_version_in_history = True
                 self.error_occurred = True
-
-        # handle corresponding part of Conformance Clause 5: CVRF CSAF converter
-        # that is: some version numbers in revision_history don't match semantic versioning
-        if not self.check_for_version_t(revision_history):
-            if not missing_latest_version_in_history:
-                revision_history, version = self._reindex_versions_to_integers(root, revision_history)
-            else:
-                logging.error(
-                    'Can not reindex revision history to integers because of missing'
-                    ' the current version. This can be fixed with'
-                    ' --fix-insert-current-version-into-revision-history'
+                level = logging.ERROR
+                message = (
+                    'Current version is missing in revision history.'
+                    ' This can be fixed by using --fix-insert-current-version-into-revision-history.'
                 )
-                self.error_occurred = True
+            logging.log(level, message)
 
-        # cleanup extra vars
-        for revision in revision_history:  # type: ignore
-            revision.pop('number_cvrf')  # type: ignore
-            revision.pop('version_as_int_tuple')  # type: ignore
+        if not self.only_version_t(revision_history):  # one or more versions do not comply
+            if missing_latest_version_in_history:
+                self.error_occurred = True
+                logging.error(
+                    'Can not reindex revision history to integers because of missing the current version.'
+                    ' This can be fixed with --fix-insert-current-version-into-revision-history'
+                )
+            else:  # sort and replace version values with rank as per conformance rule
+                revision_history, version = self._reindex_versions_to_integers(root, revision_history)
+
+        for revision in revision_history:  # remove temporary fields
+            revision.pop('number_cvrf')
+            revision.pop('version_as_int_tuple')
 
         return revision_history, version

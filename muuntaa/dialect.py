@@ -4,27 +4,27 @@ from dataclasses import dataclass
 from typing import Union
 
 BRANCH_TYPE = {
-    'Vendor': 'vendor',
+    'Architecture': 'architecture',
+    'Host Name': 'host_name',
+    'Language': 'language',
+    'Legacy': 'legacy',
+    'Patch Level': 'patch_level',
     'Product Family': 'product_family',
     'Product Name': 'product_name',
     'Product Version': 'product_version',
-    'Patch Level': 'patch_level',
-    'Service Pack': 'service_pack',
-    'Architecture': 'architecture',
-    'Language': 'language',
-    'Legacy': 'legacy',
-    'Specification': 'specification',
-    'Host Name': 'host_name',
     'Realm': 'product_name',  # Does not exist in CSAF, closest match is product_name
     'Resource': 'product_name',  # Does not exist in CSAF, closest match is product_name
+    'Service Pack': 'service_pack',
+    'Specification': 'specification',
+    'Vendor': 'vendor',
 }
 
 PUBLISHER_TYPE_CATEGORY = {
-    'Vendor': 'vendor',
     'Coordinator': 'coordinator',
-    'User': 'user',
     'Discoverer': 'discoverer',
     'Other': 'other',
+    'User': 'user',
+    'Vendor': 'vendor',
 }
 
 RELATION_TYPE = {
@@ -36,30 +36,30 @@ RELATION_TYPE = {
 }
 
 REMEDIATION_CATEGORY = {
-    'Workaround': 'workaround',
     'Mitigation': 'mitigation',
-    'Vendor Fix': 'vendor_fix',
     'None Available': 'none_available',
+    'Vendor Fix': 'vendor_fix',
     'Will Not Fix': 'no_fix_planned',
+    'Workaround': 'workaround',
 }
 
 SCORE_CVSS_V2 = {
     'BaseScoreV2': 'baseScore',
-    'TemporalScoreV2': 'temporalScore',
     'EnvironmentalScoreV2': 'environmentalScore',
+    'TemporalScoreV2': 'temporalScore',
     'VectorV2': 'vectorString',
 }
 
 SCORE_CVSS_V3 = {
     'BaseScoreV3': 'baseScore',
-    'TemporalScoreV3': 'temporalScore',
     'EnvironmentalScoreV3': 'environmentalScore',
+    'TemporalScoreV3': 'temporalScore',
     'VectorV3': 'vectorString',
 }
 
 TRACKING_STATUS = {
-    'Final': 'final',
     'Draft': 'draft',
+    'Final': 'final',
     'Interim': 'interim',
 }
 

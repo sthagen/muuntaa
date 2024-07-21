@@ -11,6 +11,7 @@ from itertools import chain
 import lxml.objectify  # nosec B410
 
 from muuntaa.ack import Acknowledgments
+from muuntaa.dialect import SCORE_CVSS_V2, SCORE_CVSS_V3, REMEDIATION_CATEGORY
 from muuntaa.notes import Notes
 from muuntaa.refs import References
 from muuntaa.strftime import get_utc_timestamp
@@ -28,28 +29,6 @@ class Vulnerabilities(Subtree):
         /cvrf:cvrfdoc/vuln:Vulnerability,
     )
     """
-
-    CVSS_V3_OF = {
-        'BaseScoreV3': 'baseScore',
-        'TemporalScoreV3': 'temporalScore',
-        'EnvironmentalScoreV3': 'environmentalScore',
-        'VectorV3': 'vectorString',
-    }
-
-    CVSS_V2_OF = {
-        'BaseScoreV2': 'baseScore',
-        'TemporalScoreV2': 'temporalScore',
-        'EnvironmentalScoreV2': 'environmentalScore',
-        'VectorV2': 'vectorString',
-    }
-
-    REMEDIATION_CATEGORY_OF = {
-        'Workaround': 'workaround',
-        'Mitigation': 'mitigation',
-        'Vendor Fix': 'vendor_fix',
-        'None Available': 'none_available',
-        'Will Not Fix': 'no_fix_planned',
-    }
 
     def __init__(self, config: ConfigType):
         super().__init__()
@@ -97,11 +76,11 @@ class Vulnerabilities(Subtree):
                 'category': threat_elem.attrib['Type'].lower().replace(' ', '_'),
             }
 
-            if hasattr(threat_elem, 'ProductID'):
-                threat['product_ids'] = [product_id.text for product_id in threat_elem.ProductID]
+            if product_ids := threat_elem.ProductID:
+                threat['product_ids'] = [product_id.text for product_id in product_ids]
 
-            if hasattr(threat_elem, 'GroupID'):
-                threat['group_ids'] = [group_id.text for group_id in threat_elem.GroupID]
+            if group_ids := threat_elem.GroupID:
+                threat['group_ids'] = [group_id.text for group_id in group_ids]
 
             if 'Date' in threat_elem.attrib:
                 threat['date'] = get_utc_timestamp(threat_elem.attrib['Date'])
@@ -116,28 +95,27 @@ class Vulnerabilities(Subtree):
         remediations = []
         for remediation_elem in root.Remediation:
             remediation = {
-                'category': self.REMEDIATION_CATEGORY_OF[remediation_elem.attrib['Type']],
+                'category': REMEDIATION_CATEGORY[remediation_elem.attrib['Type']],
                 'details': remediation_elem.Description.text,
             }
 
-            if hasattr(remediation_elem, 'Entitlement'):
-                remediation['entitlements'] = [entitlement.text for entitlement in remediation_elem.Entitlement]
+            if entitlements := remediation_elem.Entitlement:
+                remediation['entitlements'] = [entitlement.text for entitlement in entitlements]
 
-            if hasattr(remediation_elem, 'URL'):
-                remediation['url'] = remediation_elem.URL.text
+            if url := remediation_elem.URL:
+                remediation['url'] = url.text
 
-            if hasattr(remediation_elem, 'ProductID'):
-                remediation['product_ids'] = [product_id.text for product_id in remediation_elem.ProductID]
+            if product_ids := remediation_elem.ProductID:
+                remediation['product_ids'] = [product_id.text for product_id in product_ids]
 
-            if hasattr(remediation_elem, 'GroupID'):
-                remediation['group_ids'] = [group_id.text for group_id in remediation_elem.GroupID]
+            if group_ids := remediation_elem.GroupID:
+                remediation['group_ids'] = [group_id.text for group_id in group_ids]
 
-            # one of the conversion rules specifies what to do in case of missing
-            # ProductIDs and GroupIDs
-            if 'product_ids' not in remediation and 'group_ids' not in remediation:
-                if product_status:
+            if not any(('product_ids' in remediation, 'group_ids' in remediation)):
+                if product_status:  # try to fix
                     product_ids = Vulnerabilities._parse_affected_product_ids(product_status)
-            if len(product_ids) != 0:
+
+            if len(product_ids):
                 remediation['product_ids'] = product_ids
             else:
                 self.some_error = True
@@ -168,46 +146,37 @@ class Vulnerabilities(Subtree):
     @no_type_check
     def _parse_score_set(self, score_set_element, mapping, version, json_property, product_status):
         """Parses ScoreSetV2 or ScoreSetV3 element."""
-
-        # Parse all input elements except ProductID
-        # note: baseScore is always present since it's mandatory for the input
         cvss_score = {
             csaf: score_set_element.find(f'{{*}}{cvrf}').text
             for cvrf, csaf in mapping.items()
             if score_set_element.find(f'{{*}}{cvrf}')
         }
 
-        # Convert all possible scores to float
         scores = ['baseScore', 'temporalScore', 'environmentalScore']
         for score in scores:
             if cvss_score.get(score):
                 cvss_score[score] = float(cvss_score[score])
 
-        # Only cvss_v3 has baseSeverity
-        if json_property == 'cvss_v3':
+        if json_property == 'cvss_v3':  # Only cvss_v3 has baseSeverity
             cvss_score['baseSeverity'] = self._base_score_to_severity(cvss_score['baseScore'])
 
-        # HANDLE product_ids
-        product_ids = []
-        # if we have ProductID element(s), parse and use
-        if hasattr(score_set_element, 'ProductID'):
-            product_ids = [product_id.text for product_id in score_set_element.ProductID]
-        # one of the conversion rules specifies what to do in case of missing ProductID element
-        elif product_status:
-            product_ids = self._parse_affected_product_ids(product_status)
+        products = []
+        if product_ids := score_set_element.ProductID:
+            products = [product_id.text for product_id in product_ids]
+        elif product_status:  # try fix missing product ids
+            products = self._parse_affected_product_ids(product_status)
 
-        if len(product_ids) == 0:
+        if len(products) == 0:
             self.some_error = True
             logging.error('No product_id entry for CVSS score set.')
 
-        # HANDLE vectorString
         # if missing, conversion fails unless remove_CVSS_values_without_vector is true
         # if remove_CVSS_values_without_vector is true, we just ignore the score_set
         if 'vectorString' not in cvss_score:
             if self.remove_cvss_values_without_vector:
                 logging.warning(
-                    'No CVSS vector string found on the input, ignoring ScoreSet element due to'
-                    ' "remove_CVSS_values_without_vector" option.'
+                    'No CVSS vector string found on the input,'
+                    ' ignoring ScoreSet element due to "remove_CVSS_values_without_vector" option.'
                 )
                 return None
 
@@ -233,20 +202,20 @@ class Vulnerabilities(Subtree):
 
         cvss_score['version'] = version
 
-        score = {json_property: cvss_score, 'products': product_ids}
+        score = {json_property: cvss_score, 'products': products}
 
         return score
 
     @no_type_check
     def _remove_cvssv3_duplicates(self, scores):
-        """
-        Removes products/cvssv3.x score sets for products having both v3.0 and v3.1 score.
+        """Removes products/cvssv3.x score sets for products having both v3.0 and v3.1 score.
+
         Three-step approach:
+
          - find products having both versions specified
          - remove those products from score set with version 3.0
          - removes score sets with no products
         """
-        # STEP 1
         products_v3_1 = set(
             chain.from_iterable(
                 [
@@ -265,108 +234,93 @@ class Vulnerabilities(Subtree):
                 ]
             )
         )
-
         both_versions = products_v3_0.intersection(products_v3_1)
 
-        # STEP 2
         for score_set in scores:
             if 'cvss_v3' in score_set and score_set['cvss_v3']['version'] == '3.0':
                 score_set['products'] = [product for product in score_set['products'] if product not in both_versions]
 
-        # STEP 3
-        scores = [score_set for score_set in scores if len(score_set['products']) > 0]
-
-        return scores
+        return [score_set for score_set in scores if len(score_set['products']) > 0]
 
     @no_type_check
     def _handle_scores(self, root: RootType, product_status):
-        scores = []
-
         score_variants = (
-            ('ScoreSetV2', self.CVSS_V2_OF, '2.0', 'cvss_v2'),
-            ('ScoreSetV3', self.CVSS_V3_OF, self.default_cvss_version, 'cvss_v3'),
+            ('ScoreSetV2', SCORE_CVSS_V2, '2.0', 'cvss_v2'),
+            ('ScoreSetV3', SCORE_CVSS_V3, self.default_cvss_version, 'cvss_v3'),
         )
+
+        scores = []
         for score_variant, mapping, score_version, target in score_variants:
             for score_set in root.findall(f'{{*}}{score_variant}'):
                 score = self._parse_score_set(score_set, mapping, score_version, target, product_status)
                 if score is not None:
                     scores.append(score)
 
-        scores = self._remove_cvssv3_duplicates(scores)
-
-        return scores
+        return self._remove_cvssv3_duplicates(scores)
 
     def sometimes(self, root: RootType) -> None:
         vulnerability = {}
-
-        if hasattr(root, 'Acknowledgments'):
-            # reuse Acknowledgments handler
+        if acknowledgments := root.Acknowledgments:
             acks = Acknowledgments(lc_parent_code='vuln')
-            acks.load(root.Acknowledgments)
+            acks.load(acknowledgments)
             vulnerability['acknowledgments'] = acks.dump()
 
-        if hasattr(root, 'CVE'):
-            # "^CVE-[0-9]{4}-[0-9]{4,}$" differs from the CVRF regex.
-            # Will be checked by json schema validation.
-            vulnerability['cve'] = root.CVE.text  # type: ignore
+        if cve := root.CVE:
+            # Note: "^CVE-[0-9]{4}-[0-9]{4,}$" differs from CVRF regex -> delegate to JSON Schema validation
+            vulnerability['cve'] = cve.text  # type: ignore
 
-        if hasattr(root, 'CWE'):
-            cwe_elements = root.CWE
-            if len(cwe_elements) > 1:
-                logging.warning('%s CWE elements found, using only the first one.', len(cwe_elements))
-            vulnerability['cwe'] = {'id': cwe_elements[0].attrib['ID'], 'name': cwe_elements[0].text}
+        if cwes := root.CWE:
+            if len(cwes) > 1:
+                logging.warning('%s CWE elements found, using only the first one.', len(cwes))
+            vulnerability['cwe'] = {'id': cwes[0].attrib['ID'], 'name': cwes[0].text}
 
-        if hasattr(root, 'DiscoveryDate'):
-            discovery_date, problems = get_utc_timestamp(root.DiscoveryDate.text or '')
+        if discovery_date_in := root.DiscoveryDate:
+            discovery_date, problems = get_utc_timestamp(discovery_date_in.text or '')
             for level, problem in problems:
                 logging.log(level, problem)
             vulnerability['discovery_date'] = discovery_date  # type: ignore
 
-        if hasattr(root, 'ID'):
+        if vuln_id := root.ID:
             vulnerability['ids'] = [
-                {'system_name': root.ID.attrib['SystemName'], 'text': root.ID.text},  # type: ignore
+                {'system_name': vuln_id.attrib['SystemName'], 'text': vuln_id.text},  # type: ignore
             ]
 
-        if hasattr(root, 'Involvements'):
-            vulnerability['involvements'] = self._handle_involvements(root.Involvements)
+        if involvements := root.Involvements:
+            vulnerability['involvements'] = self._handle_involvements(involvements)
 
-        if hasattr(root, 'Notes'):
-            # reuse Notes handler
+        if notes_root := root.Notes:
             notes = Notes(lc_parent_code='vuln')
-            notes.load(root.Notes)
+            notes.load(notes_root)
             vulnerability['notes'] = notes.dump()
 
-        if hasattr(root, 'ProductStatuses'):
-            vulnerability['product_status'] = self._handle_product_statuses(root.ProductStatuses)
+        if product_statuses := root.ProductStatuses:
+            vulnerability['product_status'] = self._handle_product_statuses(product_statuses)
 
-        if hasattr(root, 'References'):
-            # reuse References handler
+        if references_root := root.References:
             references = References(config=self.config, lc_parent_code='vuln')
-            references.load(root.References)
+            references.load(references_root)
             vulnerability['references'] = references.dump()
 
-        if hasattr(root, 'ReleaseDate'):
-            release_date, problems = get_utc_timestamp(root.ReleaseDate.text or '')
+        if release_date_in := root.ReleaseDate:
+            release_date, problems = get_utc_timestamp(release_date_in.text or '')
             for level, problem in problems:
                 logging.log(level, problem)
             vulnerability['release_date'] = release_date  # type: ignore
 
-        if hasattr(root, 'Remediations'):
-            vulnerability['remediations'] = self._handle_remediations(
-                root.Remediations, vulnerability.get('product_status')
-            )
+        if remediations := root.Remediations:
+            product_status = vulnerability.get('product_status')
+            vulnerability['remediations'] = self._handle_remediations(remediations, product_status)
 
-        if hasattr(root, 'CVSSScoreSets'):
-            scores = self._handle_scores(root.CVSSScoreSets, vulnerability.get('product_status'))
-            if len(scores) == 0:
-                logging.warning('None of the ScoreSet elements parsed,' ' removing "scores" entry from the output.')
-            else:
+        if scores_root := root.CVSSScoreSets:
+            if len(scores := self._handle_scores(scores_root, vulnerability.get('product_status'))):
                 vulnerability['scores'] = scores
+            else:
+                logging.warning('None of the ScoreSet elements parsed, removing "scores" entry from the output.')
 
-        if hasattr(root, 'Threats'):
-            vulnerability['threats'] = self._handle_threats(root.Threats)
+        if threats := root.Threats:
+            vulnerability['threats'] = self._handle_threats(threats)
 
-        if hasattr(root, 'Title'):
-            vulnerability['title'] = root.Title.text  # type: ignore
+        if title := root.Title:
+            vulnerability['title'] = title.text  # type: ignore
 
         self.hook.append(vulnerability)

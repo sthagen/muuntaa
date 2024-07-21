@@ -4,6 +4,7 @@ import datetime as dti
 import logging
 import os
 import pathlib
+import re
 import sys
 from typing import Union, no_type_check
 
@@ -39,6 +40,16 @@ OVERWRITABLE_KEYS = [
     'force',
 ]
 CSAF_FILE_SUFFIX = '.json'
+
+# Semantic version is defined in version_t definition.
+# Cf. https://docs.oasis-open.org/csaf/csaf/v2.0/csaf-v2.0.html#3111-version-type
+# and section 9.1.5 Conformance Clause 5: CVRF CSAF converter
+VERSION_PATTERN = re.compile(
+    r'^((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)'
+    r'(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)'
+    r'(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))'
+    r'?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$'
+)
 
 ConfigType = dict[str, Union[None, bool, int, float, str]]
 LogLevel = int
@@ -83,6 +94,7 @@ __all__: list[str] = [
     'ScopedMessages',
     'VERSION',
     'VERSION_DOTTED_TRIPLE',
+    'VERSION_PATTERN',
     'WriterOptions',
     'cleanse_id',
     'integer_tuple',

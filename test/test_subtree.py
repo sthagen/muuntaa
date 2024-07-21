@@ -9,7 +9,10 @@ from muuntaa.notes import Notes
 from muuntaa.refs import References
 from muuntaa import APP_ALIAS, VERSION
 
-CFG = {'csaf_version': '2.0'}
+CFG = {
+    'csaf_version': '2.0',
+    'fix_insert_current_version_into_revision_history': 'true',
+}
 CFG_TOO = {
     'publisher_name': 'Publisher Name',
     'publisher_namespace': 'https://example.com',
