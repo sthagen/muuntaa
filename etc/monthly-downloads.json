@@ -36,6 +36,11 @@
       "downloads": 8
     },
     {
+      "category": "3.9",
+      "date": "2025-03",
+      "downloads": 2
+    },
+    {
       "category": "null",
       "date": "2024-09",
       "downloads": 18
@@ -68,7 +73,7 @@
     {
       "category": "null",
       "date": "2025-03",
-      "downloads": 8
+      "downloads": 11
     }
   ],
   "package": "muuntaa",
