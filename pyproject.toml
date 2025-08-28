@@ -20,11 +20,15 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.9",
 ]
 keywords = ["developer-tools", "devops"]
 dependencies = [
-    "msgspec >= 0.18.4",
+    "PyYAML >= 6.0.1",
+    "lxml> = 5.1.0",
+    "msgspec >= 0.18.5",
 ]
 requires-python = ">=3.9"
 
@@ -48,7 +52,7 @@ exclude = ["test*"]
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-target-version = [ "py39", "py310", "py311", "py312" ]
+target-version = [ "py39", "py310", "py311", "py312", "py313" ]
 
 [tool.coverage.run]
 branch = true
