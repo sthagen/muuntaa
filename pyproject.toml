@@ -7,7 +7,8 @@ name = "muuntaa"
 version = "2023.10.21"
 description = "Convert (Finnish: muuntaa) CVRF v1.2 XML to CSAF v2.0 JSON documents."
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Stefan Hagen", email = "stefan@hagen.link" },
 ]
@@ -17,18 +18,18 @@ maintainers = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3.9",
 ]
 keywords = ["developer-tools", "devops"]
 dependencies = [
-    "PyYAML >= 6.0.1",
-    "lxml> = 5.1.0",
-    "msgspec >= 0.18.5",
+    "PyYAML >= 6.0.3",
+    "lxml> = 6.0.2",
+    "msgspec >= 0.20.0",
 ]
 requires-python = ">=3.9"
 
@@ -52,7 +53,7 @@ exclude = ["test*"]
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-target-version = [ "py39", "py310", "py311", "py312", "py313" ]
+target-version = [ "py39", "py310", "py311", "py312", "py313", "py314" ]
 
 [tool.coverage.run]
 branch = true
@@ -67,10 +68,8 @@ strict = true
 implicit_reexport = true
 
 [tool.pytest]
-testpaths = "test"
-filterwarnings = "error"
-
-[tool.pytest.ini_options]
+testpaths = ["test"]
+filterwarnings = ["error"]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
